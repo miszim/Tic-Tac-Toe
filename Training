@@ -1,0 +1,201 @@
+#include <iostream>
+#include <string>
+#include <cstdlib>
+
+
+class board{
+public:
+    int boardObject[3][3];
+    int moveWidth=0;
+    int moveHeight=0;
+    int values =0;
+    int values2 =0;
+
+    void display(){
+        for(int i =0;i<3;i++){
+            for(int j =0;j<3;j++){
+                switch(boardObject[i][j]){
+                    case 1: std::cout<<"[ ]"; break;
+                    case 2: std::cout<<"[o]"; break;
+                    case 5: std::cout<<"[x]"; break;
+                    default: std::cout<<"error"; break;
+                };
+                if(j==2)
+                    std::cout<<"\n";
+            };
+        };
+        std::cout<<"\n";
+    };
+
+    void initialization(){
+        for(int i =0;i<3;i++){
+            for(int j =0;j<3;j++)
+                boardObject[i][j]=1;
+        }
+    };
+
+    void horizontal(){
+        for(int i=0;i<3;i++) {
+            for (int j = 0; j < 3; j++) {
+                values += boardObject[i][j];
+            }
+            if (values == 6) {
+                std::cout << "Circle have won horizontaly";
+                exit(0);
+            }
+            if (values == 15){
+                std::cout << "Cross have won horizontaly";
+                exit(0);
+            }
+            values=0;
+        }
+
+    };
+
+    void vertical(){
+        for(int i=0;i<3;i++) {
+            for (int j = 0; j < 3; j++) {
+                values += boardObject[j][i];
+                //std::cout << values;
+            }
+            if (values == 6) {
+                std::cout << "Circle have won verticaly";
+                exit(0);
+            }
+            if (values == 15){
+                std::cout << "Cross have won verticaly";
+                exit(0);
+            }
+            values=0;
+        }
+
+    };
+
+    void diagonally(){
+            values = boardObject[0][0] + boardObject[1][1] + boardObject[2][2];
+            values2 = boardObject[2][2]+boardObject[1][1]+boardObject[0][0];
+        if ((values == 6)||(values2==6)) {
+            std::cout << "Circle have won diagonally";
+            exit(0);
+        }
+        if ((values == 15)||(values2==15)){
+            std::cout << "Cross have won diagonally";
+            exit(0);
+        }
+        values =0;
+        values2 =0;
+    };
+    void none() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                values += boardObject[i][j];
+            }
+        };
+        if((values==30)||(values==33)) {
+            std::cout << "Draw";
+            exit(0);
+        }else
+            values=0;
+    }
+
+    void winner(){
+        horizontal();
+        vertical();
+        diagonally();
+        none();
+    };
+
+    void move(std::string side){
+        std::string sideMove;
+
+        std::cout<<"Choose position to mark on a board, by inserting two values in range of 1-3 without any spaces or dots\n";
+        do{
+            std::cout<<"Width\n";
+            std::cin>>moveWidth;
+            while((moveWidth<1)||(moveWidth>3)){
+                std::cout<<"incorrect value, try again\n";
+                std::cin>>moveWidth;
+            };
+            std::cout<<"Height\n";
+            std::cin>>moveHeight;
+            while((moveHeight<1)||(moveHeight>3)){
+                std::cout<<"incorrect value, try again\n";
+                std::cin>>moveHeight;
+            };
+            if(boardObject[moveHeight-1][moveWidth-1]!=1){
+                std::cout<<"Someone has already filled this place\n";
+            };
+        }while(boardObject[moveHeight-1][moveWidth-1]!=1);
+        if(side[0]=='o'){
+            boardObject[moveHeight-1][moveWidth-1] = 2;
+        }else if(side[0]=='x'){
+            boardObject[moveHeight-1][moveWidth-1] = 5;
+        }
+        display();
+        winner();
+    };
+    void oponentMove(std::string side){
+        int moveWidthh;
+        int moveHeighth;
+        do{
+            moveWidthh  = std::rand() % 3+1;
+            moveHeighth = std::rand() % 3+1;
+        }while(boardObject[moveHeighth-1][moveWidthh-1]>1);
+        if((side[0]=='o')||(boardObject[moveHeighth-1][moveWidthh-1]!=1)){
+            boardObject[moveHeighth-1][moveWidthh-1] = 5;
+        }else if((side[0]=='x')||(boardObject[moveHeighth-1][moveWidthh-1])){
+            boardObject[moveHeighth-1][moveWidthh-1] = 2;
+        }
+        std::cout<<"Oponent's move"<<std::endl;
+        display();
+        winner();
+    };
+
+};
+
+
+
+int main() {
+
+    std::string side;
+    bool doesWork= true;
+    bool Circle = false;
+    bool oponentCircle = false;
+    board board1;
+
+
+    board1.initialization();
+
+    std::cout << "Welcome to the game of Tic Tac Toe\n";
+    std::cout << "Which shape do you prefere ? \n";
+    std::cout << "Circle[o]\tCross[x]\n";
+    getline(std::cin, side);
+    while (doesWork) {
+        if ((side.length() != 1)||(!((side[0] == 'o')||(side[0] == 'x')))) {
+            std::cout << "Incorrect value, insert only one letter and it must be 'o' or 'x'\n";
+            getline(std::cin, side);
+        }else {
+            doesWork= false;
+        }
+    };
+    if (side[0]=='o'){
+        Circle = true;
+        std::cout<<"You have choosen a Circle\n";
+        std::cout<<"Make a first move\n";
+        std::cout<<"This is how the board looks like\n";
+        board1.display();
+        board1.move(side);
+    }else{
+        oponentCircle = true;
+        std::cout<<"You have choosen a Cross\n";
+        std::cout<<"Your oponent starts";
+    }
+    while(true){
+        board1.oponentMove(side);
+        board1.move(side);
+    }
+
+
+
+    return 0;
+};
